@@ -2,9 +2,13 @@ import sys
 from dataclasses import asdict
 avogadro = 6.022 * 10 ** 23
 
+# start questions, necessary for calculator to work.
+
 molecule_name = input("What is the name of the molecule?: ")
 molecular_weight = input("What is the molecular weight (g/mol)?: ")
-x = int(input("How many decimal points?: "))
+x = int(input("How many decimal points would you like?: "))
+
+# only if a prepared solution has been created. Not designed yet in a c1v1 = c2v2 way (TODO).
 
 print("----------Prepared Solution----------")
 
@@ -17,7 +21,7 @@ def moles_concentration(mass, molecular_weight, volume):
     molecules = float(mass) / float(molecular_weight) * avogadro
     return moles, molarity, gml, g100ml, ppm, molecules
 
-intro_start = input("Do you have a solution made up? (y/n): ")
+intro_start = input("Do you have a solution made up? (y/n). For dilutions, input (n): ")
 if intro_start == "y":
     mass = input("What is your mass? (g): ")
     volume = input("What is your volume? (L): ")
@@ -33,11 +37,42 @@ if intro_start == "y":
     print(f"You have {ppm:.{x}f} ppm.".format(ppm, x))
     print(f"You have {molecules:e} molecules of {molecule_name}.".format(molecules,x))  # xyz:e makes it into scientific notation
 if intro_start == "n":
-    continue_0 = input("Would you like to continue to solution calculations? (y/n): ")
+    continue_0 = input("Would you like to continue to solution calculations? (y/n)? To access dilution calculations, input (d): ")
     if continue_0 == 'y':
         print("----------Solution Calculator----------")
     elif continue_0 == 'n':
         sys.exit()
+    elif continue_0 == 'd':
+        dilution = input("What are the units ? (M = moles/L, g = g/mL, g100 = g/100mL, p = ppm.: ")
+        c2 = input("What is the desired concentration? (Units as chosen prior): ")
+        c1 = input("What is your current concentration? (Units as chosen prior): ")
+        testc1c2 = float(c1) - float(c2)
+        while testc1c2 < 0:
+            print("Your starting concentration is too low!")
+            try_again = input("Would you like to try again? (y/n): ")
+            if try_again == 'y':
+                c2 = input("What is the desired concentration? (Units as chosen prior): ")
+                c1 = input("What is your current concentration? (Units as chosen prior): ")
+            testc1c2 = float(c1) - float(c2)
+            if testc1c2 > 0:
+                break
+            if try_again == 'n':
+                print("Thank you for using this calculator!")
+                sys.exit()
+        v2 = input("What is your desired volume? (L): ")
+        def dilution_function(c2, c1, v2):
+            dilution_dictionary = {"M": "moles/L", "g": "g/mL", "g100": "g100ml", "p": "ppm"}
+            v1 = (float(c2) * float(v2)) / float(c1)
+            unit = dilution_dictionary.get(dilution, dilution)
+            dilution_response = f"You require {v1:.{x}f} L of {c1} {unit} {molecule_name} made up to {v2} L."
+            return dilution_response
+
+        dilution_response = dilution_function(c2, c1, v2)
+        dilution_selection = dilution_function(c2, c1, v2)
+        print(dilution_selection)
+
+        sys.exit()
+
     else:
         sys.exit()
 
@@ -46,7 +81,7 @@ def solution(mass, volume, moles, percent_solution, percent_solution_vol):
     return percent_makeup, molar_solution
 
 def choice():
-    answer = input("Is a % solution required (y/n), select (n) for molarity: ")
+    answer = input("Is a % solution required (y)? Select (n) for molarity: ")
     if answer == 'y':
         return "% solution"
     answer = input("Is a molar solution required (y/n): ")  # will retain in case of different solution set-up method needed.
