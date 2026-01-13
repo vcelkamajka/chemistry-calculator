@@ -2,6 +2,7 @@ import sys
 from dataclasses import asdict
 
 molecule_name = input("What is the name of the molecule?: ")
+molecular_weight = input("What is the molecular weight (g/mol)?: ")
 avogadro = 6.022 * 10 ** 23
 
 def moles_concentration(mass, molecular_weight, volume):
@@ -13,36 +14,37 @@ def moles_concentration(mass, molecular_weight, volume):
     molecules = float(mass) / float(molecular_weight) * avogadro
     return moles, molarity, gml, g100ml, ppm, molecules
 
-mass = input("What is your mass? (g): ")
-molecular_weight = input("What is your molecular weight? (g/mol): ")
-volume = input("What is your volume? (L): ")
-x = int(input("How many decimal points?: "))
+intro_start = input("Do you have a solution made up? (y/n): ")
+if intro_start == "y":
+    mass = input("What is your mass? (g): ")
+    volume = input("What is your volume? (L): ")
+    x = int(input("How many decimal points?: "))
 
-# {} act as placeholders for values,
-# .format puts values into {}
+    # {} act as placeholders for values,
+    # .format puts values into {}
 
-moles, molarity, gml, g100ml, ppm, molecules = moles_concentration(mass, molecular_weight, volume)
-print(f"You have {moles:.{x}f} moles;".format(moles, x))
-print(f"You have {molarity:.{x}f} moles/L;".format(molarity, x))
-print(f"You have {gml:.{x}f} g/mL;".format(gml, x))
-print(f"You have {g100ml:.{x}f} g/100mL;".format(g100ml, x))
-print(f"You have {ppm:.{x}f} ppm.".format(ppm, x))
-print(f"You have {molecules:e} molecules.".format(molecules, x))        # xyz:e makes it into scientific notation
-
-continue_0 = input("Would you like to continue to solution calculations? (y/n): ")
-if continue_0 == 'y':
-    print("Perfect!")
-elif continue_0 == 'n':
-    sys.exit()
-else:
-    sys.exit()
+    moles, molarity, gml, g100ml, ppm, molecules = moles_concentration(mass, molecular_weight, volume)
+    print(f"You have {moles:.{x}f} moles;".format(moles, x))
+    print(f"You have {molarity:.{x}f} moles/L;".format(molarity, x))
+    print(f"You have {gml:.{x}f} g/mL;".format(gml, x))
+    print(f"You have {g100ml:.{x}f} g/100mL;".format(g100ml, x))
+    print(f"You have {ppm:.{x}f} ppm.".format(ppm, x))
+    print(f"You have {molecules:e} molecules of {molecule_name}.".format(molecules,x))  # xyz:e makes it into scientific notation
+if intro_start == "n":
+    continue_0 = input("Would you like to continue to solution calculations? (y/n): ")
+    if continue_0 == 'y':
+        print("Perfect!")
+    elif continue_0 == 'n':
+        sys.exit()
+    else:
+        sys.exit()
 
 def solution(mass, volume, moles, percent_solution, percent_solution_vol):
     percent_makeup = float(percent_solution) * float(percent_solution_vol)
     return percent_makeup, molar_solution
 
 def choice():
-    answer = input("Is a % solution required (y/n): ")
+    answer = input("Is a % solution required (y/n), select (n) for molarity: ")
     if answer == 'y':
         return "% solution"
     answer = input("Is a molar solution required (y/n): ")
@@ -63,7 +65,7 @@ if selection == '% solution':
     percent_solution = input("What % is required?: ")
     percent_solution_vol = input("What volume is required? (L): ")
     percent_makeup, percent_solution_molarity = percent_solution_function(percent_solution, percent_solution_vol)
-    print(f"You need {percent_makeup:.{x}f} g of {molecule_name} in {percent_solution_vol} L. This is equivalent to {percent_solution_molarity:.{x}f} M,".format(percent_makeup, x))
+    print(f"You need {percent_makeup:.{x}f} g of {molecule_name} in {percent_solution_vol} L. This is equivalent to {percent_solution_molarity:.{x}f} M.".format(percent_makeup, x))
 
 def molarity_solution_function(molarity_required, molecular_weight, molarity_volume):
     molarity_solution_mass = float(molarity_required) * float(molarity_volume) * float(molecular_weight)
@@ -74,4 +76,4 @@ if selection == 'molar solution':
     molarity_required = input("What molarity is required?: ")
     molarity_volume = input("What volume is required? (L): ")
     molarity_solution_mass, molarity_solution_percentage = molarity_solution_function(molarity_required, molecular_weight, molarity_volume)
-    print(f"You need {molarity_solution_mass} g of {molecule_name} in {molarity_volume} L. This is equivalent to {molarity_solution_percentage}%.")
+    print(f"You need {molarity_solution_mass} g of {molecule_name} in {molarity_volume} L. This is equivalent to a {molarity_solution_percentage}% solution.")
