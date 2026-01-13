@@ -56,20 +56,22 @@ print("You chose:",selection)
 
 def percent_solution_function(percent_solution, percent_solution_vol):
     percent_makeup = float(percent_solution) * float(percent_solution_vol) * 10
-    return percent_makeup
+    percent_solution_molarity = (float(percent_solution) * float(percent_solution_vol) * 10) / float(molecular_weight) / float(percent_solution_vol)
+    return percent_makeup, percent_solution_molarity
 
 if selection == '% solution':
     percent_solution = input("What % is required?: ")
     percent_solution_vol = input("What volume is required? (L): ")
-    percent_makeup = percent_solution_function(percent_solution, percent_solution_vol)
-    print(f"You need {percent_makeup:.{x}f} g of {molecule_name} in {percent_solution_vol} L".format(percent_makeup, x))
+    percent_makeup, percent_solution_molarity = percent_solution_function(percent_solution, percent_solution_vol)
+    print(f"You need {percent_makeup:.{x}f} g of {molecule_name} in {percent_solution_vol} L. This is equivalent to {percent_solution_molarity:.{x}f} M,".format(percent_makeup, x))
 
 def molarity_solution_function(molarity_required, molecular_weight, molarity_volume):
     molarity_solution_mass = float(molarity_required) * float(molarity_volume) * float(molecular_weight)
-    return molarity_solution_mass
+    molarity_solution_percentage = (float(molarity_required) * float(molarity_volume) * float(molecular_weight) / 10) / float(molarity_volume)
+    return molarity_solution_mass, molarity_solution_percentage
 
 if selection == 'molar solution':
     molarity_required = input("What molarity is required?: ")
     molarity_volume = input("What volume is required? (L): ")
-    molarity_solution_mass = molarity_solution_function(molarity_required, molecular_weight, molarity_volume)
-    print(f"You need {molarity_solution_mass} g of {molecule_name} in {molarity_volume} L.")
+    molarity_solution_mass, molarity_solution_percentage = molarity_solution_function(molarity_required, molecular_weight, molarity_volume)
+    print(f"You need {molarity_solution_mass} g of {molecule_name} in {molarity_volume} L. This is equivalent to {molarity_solution_percentage}%.")
