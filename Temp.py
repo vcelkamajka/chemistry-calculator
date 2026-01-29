@@ -1,8 +1,11 @@
-Temperature = input("Enter Temperature in Celsius:")
-Scale = input("Do you want it in Fahrenheit (Y) or Kelvin (N)?: ")
-if(Scale == "Y"):
-    ConvertF = int(Temperature) * 9 / 5 + 32
-    print("Degrees in Fahrenheit: " + str(ConvertF))
-if(Scale == "N"):
-    ConvertK = int(Temperature) + 273.15
-    print("Degrees in Kelvin: " + str(ConvertK))
+temperature = input("Enter temperature in Celsius: ")
+
+def temp_convert(temperature):
+    convertF = float(temperature) * 9 / 5 + 32
+    convertK = float(temperature) + 273.15
+    return convertF, convertK
+
+F, K = temp_convert(temperature)    # the F, K acts as variable for convertF and convertK - any thing can be used here.
+
+print(f"Fahrenheit: {F:.2f}°F")
+print(f"Kelvin: {K:.2f} K")
