@@ -1,0 +1,12 @@
+# Data from csv file, copy and paste line 3 and below and insert into a csv.
+# Name the file: CFAE DOE.csv
+
+Run	CFAE Conc. (mM)	% Glycerol	% Castor Oil	% Water	% Quercetin Encapsulation
+1	0.08	0.2	0.35	0.45	83
+2	0.08	0.2	0.2	0.6	78
+3	0.08	0.1	0.2	0.7	69
+4	0.01	0.1	0.2	0.7	42
+5	0.08	0.1	0.35	0.55	72
+6	0.01	0.2	0.2	0.6	49
+7	0.01	0.1	0.35	0.55	52
+8	0.01	0.2	0.35	0.6	48
