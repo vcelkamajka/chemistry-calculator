@@ -12,6 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 file_read = pd.read_csv('CFAE DOE.csv')
 
@@ -112,31 +113,31 @@ print('Model coefficients : ', model.coef_) # Beta coefficients
 
 # Correlation coefficient of model fit / as there is no centre point - higher polynomial = higher r2 !!!
 
-
 y_prediction = model.predict(x_poly)
 y_pred_flat = y_prediction.flatten() #flatten is identical to ravel
 corr_coeff = r2_score(Y, y_pred_flat)
 mse = mean_squared_error(Y, y_pred_flat)
-print(f'Correlation coefficient is {corr_coeff}.') # as there is no centre point - higher polynomial = higher r2 also cannot utilise quadratic or higher
-print(f'Mean squared error is {mse}.')
+print(f'Correlation coefficient is {corr_coeff:.4f}.') # as there is no centre point - higher polynomial = higher r2 also cannot utilise quadratic or higher
+print(f'Mean squared error is {mse:.4f}.')
+print("Intercept:", model.intercept_)
 
 
-centre_x = (max(file_read['CFAE Conc. (mM)']) - min(file_read['CFAE Conc. (mM)'])) / 2
-centre_y = (max(file_read['% Glycerol']) - min(file_read['% Glycerol'])) / 2
-centre_z = (max(file_read['% Castor Oil']) - min(file_read['% Castor Oil'])) / 2
+# VIF of 1 is ideal (no multicollinearity)
+# VIF of < 5 is low to mod. multicollinearity
+# VIF of > 5 is high (may have to remove or combine remove correlated variables)
+# VIF > 10 is v. high.
 
-# Predicting values based on three variable inputs below ----------
+vif_factors = file_read[['CFAE Conc. (mM)', '% Glycerol', '% Castor Oil']]
+vif_data = pd.DataFrame()   # makes empty DF
+vif_data['Feature'] = vif_factors.columns   # Features are the column names of the file read
 
-#x_pred = np.linspace(0.01,0.08,3).reshape(1,-1)
-#y_pred = np.linspace(0.1,0.2,3).reshape(1,-1)
-#z_pred = np.linspace(0.2,0.35,3).reshape(1,-1)
+vif_data['VIF'] = [variance_inflation_factor(vif_factors, i) for i in range(len(vif_factors.columns))] # VIF is equal to the VIF of the factors and the data indices
+print(vif_data)
 
-#x_pred, y_pred, z_pred = np.meshgrid(x_pred, y_pred, z_pred) # creates all combos of three variables
-#predict = np.column_stack((x_pred.ravel(), y_pred.ravel(), z_pred.ravel())) # makes 2D column so that 0th indexes match, 1st indexes match, 2nd ....
-#predict_poly = poly.transform(predict) # converts to quadratic regression (looks at the 10 variables - x1, x2, x1*x2 ...)
+for i in range(len(vif_data['VIF'])):
+    if vif_data['VIF'][i] > 5:
+        print(f'VIF above 5 for {vif_data['Feature'][i]}: ',round(vif_data['VIF'][i], 2)) # index of column returned for VIF > 5
 
-#Y_pred = model.predict(predict_poly)
-#print(Y_pred.ravel())
 
 #----------------------------------------------------------------------
 
@@ -158,7 +159,7 @@ for i, z_value in enumerate(z_range): # ultimately returns (index, value) -> (0,
     grid_poly = poly.transform(flat) # transforms to quadratic regression
     y_pred = model.predict(grid_poly).reshape(x1.shape) # predicts the response and converts into a 2D grid which we need for contour
 
-    contour = axes[i].contourf(x1, x2, y_pred, levels = 20, cmap = 'plasma')
+    contour = axes[i].contourf(x1, x2, y_pred, levels = 30, cmap = 'plasma')
     # i here is the index for each value of % castor 0 = 20%, 1 = 27.5%, 2 = 35% ...
     axes[i].scatter(X[x_factor], X[y_factor], c = 'red', s = 30)
     # shows each point from DOE on graph (real data)
@@ -188,6 +189,11 @@ Y = file_read[response] # quercetin encapsulation
 # ANOVA test for variance ---------------------------------------------------------------------
 
 f_statistic, p_value = f_oneway(file_read['CFAE Conc. (mM)'], file_read['% Glycerol'], file_read['% Castor Oil'])
-print(f'F-statistic for ANOVA: {f_statistic}')
-print(f'P-value for ANOVA: {p_value}')
+print(f'F-statistic for ANOVA: {f_statistic:.4f}')
+print(f'P-value for ANOVA: {p_value:.10f}')
+
+if p_value < 0.05:
+    print('Mean(s) are non-equal!')
+else:
+    print('Mean(s) are equal!')
 
